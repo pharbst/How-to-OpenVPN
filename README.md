@@ -1,20 +1,20 @@
 # VPN
-### ⚠️ pls dont use any certificates provided in this repo cause since the private keys comeing with it, it's absolutely not save  
+### ⚠️ pls dont use any certificates provided in this repo cause since the private keys comming with it, it's absolutely not save  
 this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
     
 
 ##### 1.0 [SSL Certificates](#SSL-certificates)  
-###### &emsp;&emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
-###### &emsp;&emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
-###### &emsp;&emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
-##### 3.0 [OpvenVPN](#OpenVPN)  
-###### &emsp;&emsp;3.1 [OpenVPN server.conf](#Openvpn-server.conf)  
-###### &emsp;&emsp;3.2 [Create OpenVPN Service](#Openvpn-Service)  
-###### &emsp;&emsp;3.3 [Clients](#Clients)  
-##### 4.0 [Clear the Path](#clear-the-path)  
-###### &emsp;&emsp;4.1 [Firewall](#Firewall)  
-###### &emsp;&emsp;4.2 [Portforwarding](#Portforwarding)  
-###### &emsp;&emsp;4.3 [Portmapping Server](#Portmapping-server)  
+###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
+###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
+###### &emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
+##### 2.0 [OpvenVPN](#OpenVPN)  
+###### &emsp;2.1 [OpenVPN server.conf](#Openvpn-server.conf)  
+###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
+###### &emsp;2.3 [Clients](#Clients)  
+##### 3.0 [Clear the Path](#clear-the-path)  
+###### &emsp;3.1 [Firewall](#Firewall)  
+###### &emsp;3.2 [Portforwarding](#Portforwarding)  
+###### &emsp;3.3 [Portmapping Server](#Portmapping-server)  
 
 
 ## SSL Certificates
@@ -24,7 +24,7 @@ both will now check if the certificate they just recieved is signed by one of th
 the certificates provide some information who they pretend to be and also a public key to encrypt data but only encrypt the decyption is done with the private key that the server has and the client has also its own private key  
 
 
-## Create SSL Certificates
+### Create SSL Certificates
 we need at least 4 private keys and certificates  
 2 of them will be certificate authoritys and the other two are for the server and a client  
 &emsp;&emsp;root_CA.crt  
@@ -87,5 +87,24 @@ openssl x509 -req -in client.csr -CA intermediate_CA.crt -CAkey intermediate_pri
 all additional clients should get their own certificate and private key to ensure security  
   
   
-## How to add a CA to the trusted CA store for Windows and Linux
+### Add CA's to trusted store on Windows
 
+### Add CA's to trusted store on Linux
+
+## OpenVPN
+OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
+
+### OpenVPN server.conf
+
+### OpenVPN Service
+
+### Clients
+
+## Clear the path
+this chapter is about how to portforwarding open ports in the firewall and also what to do when you have no public ipv4 address only a ipv6 which is reachable from outside. for example if your ipv4 is tunneled via DSlite through your ipv6
+
+### Firewall
+
+### Portforwarding
+
+### Portmapping Server
