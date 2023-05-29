@@ -1,9 +1,10 @@
 # VPN
 this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys comeing with it, it's absolutely not save  
+    
 
-##### 1.0 ssl Certificates  
-###### &emsp;&emsp;1.1 Create ssl Certificates  
+##### 1.0 [SSL Certificates](#ssl-certificates)  
+###### &emsp;&emsp;1.1 [Create SSL Certificates](#create-ssl-certificates)  
 ###### &emsp;&emsp;1.2 add CAs to trusted store on Windows  
 ###### &emsp;&emsp;1.3 add CAs to trusted store on Linux  
 ##### 3.0 OpenVPN  
