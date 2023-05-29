@@ -19,11 +19,14 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 ###### &emsp;3.3 [Portmapping Server](#Portmapping-server)  
 
 
+
+
 ## SSL Certificates
 SSL which stands for Secure Socket Layer is a method to create a secure communication between the server and the client with the so called handshake  
 during the handshake the client sends its client certificate to the server and the server sends its server certificate to the client  
 both will now check if the certificate they just recieved is signed by one of the trusted CA or certificate authoritys in their trusted CA store  
 the certificates provide some information who they pretend to be and also a public key to encrypt data but only encrypt the decyption is done with the private key that the server has and the client has also its own private key  
+
 
 
 ### Create SSL Certificates
@@ -37,8 +40,8 @@ these are the certificates we wanna create
 the root_ca is a certificate authority to create certificates and also certificate authoritys  
 the intermediate could also create certificate authoritys but is mainly used to create client and server certificates  
 every certificate needs a private key to work this privat key should be always kept save and never be shared  
-to create our root_ca.crt we first need to create a privat key which is the root of our selfsigned trustchain so store is save maybe offline on a seperate harddrive or thumbstick  
-&emsp;&emsp;but be aware that thumbdrives looses their data when left unplugged for several years even hard drives loose data after 10 years without power  
+to create our root_ca.crt we first need to create a privat key which is the root of our selfsigned trustchain so store is save  
+the same appies for the intermediate privat key
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key -pkeyopt rsa_keygen_bits:4096
 ```
@@ -87,8 +90,10 @@ openssl x509 -req -in client.csr -CA intermediate_CA.crt -CAkey intermediate_pri
 ```
 
 all additional clients should get their own certificate and private key to ensure security  
-  
-  
+
+
+
+
 ### Add CA's to trusted store on Windows
 for Windows we just need the intermediate_CA.crt  
 press "Windows key" and search for Manage user certificates  
@@ -107,6 +112,9 @@ the last massage is just to ensure that the user knows what hes doing and never 
 the only reason why we want to add our intermediate CA to the trusted store is that its a selfsigned trust chain  
 that means we have created all the certificates by our own and no company or other authority is involved in that chain
 
+
+
+
 ### Add CA's to trusted store on Linux
 for Linux we will create a ```.pem``` file which contains both CAs the intermediate and the root_CA  
 this is done by  
@@ -114,6 +122,8 @@ this is done by
 cat intermediate_CA.crt > example.pem && cat root_CA.crt >> example.pem
 ```  
 ```example.pem``` should be changed to the name you want only the .pem ending has to stay  
+
+
 
 #### Arch and RedHat
 for Arch based and Red Hat based systems we can use the ```trust``` command to add a CA list file to the trusted store
@@ -141,22 +151,33 @@ openssl verify -CApath /etc/ssl/certs/ ~/CA_trust_chain.pem
 
 
 
+
+
 ## OpenVPN
 OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems  
 OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly  
 i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
 
+
 ### OpenVPN server.conf
+
 
 ### OpenVPN Service
 
+
 ### Clients
+
 
 ## Clear the path
 this chapter is about how to portforwarding open ports in the firewall and also what to do when you have no public ipv4 address only a ipv6 which is reachable from outside. for example if your ipv4 is tunneled via DSlite through your ipv6
 
+
+
 ### Firewall
+
 
 ### Portforwarding
 
+
 ### Portmapping Server
+
