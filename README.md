@@ -94,7 +94,10 @@ for Windows we just need the intermediate_CA.crt
 
 ### Add CA's to trusted store on Linux
 for Linux we will create a ```.pem``` file which contains both CAs the intermediate and the root_CA  
-this is done by ```cat intermediate_CA.crt > example.pem && cat root_CA.crt >> example.pem```  
+this is done by  
+```bash
+cat intermediate_CA.crt > example.pem && cat root_CA.crt >> example.pem
+```  
 ```example.pem``` should be changed to the name you want only the .pem ending has to stay  
 
 #### Arch and RedHat
