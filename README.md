@@ -90,7 +90,22 @@ all additional clients should get their own certificate and private key to ensur
   
   
 ### Add CA's to trusted store on Windows
-for Windows we just need the intermediate_CA.crt
+for Windows we just need the intermediate_CA.crt  
+press "Windows key" and search for Manage user certificates  
+
+In the ```Certificates - Current User``` window, navigate to the ```Trusted Root Certification Authorities``` folder in the left-hand pane  
+Right-click on the ```Trusted Root Certification Authorities``` folder and select ```All Tasks``` -> ```Import```  
+The Certificate Import Wizard will open. Click ```Next``` to proceed  
+Click the ```Browse``` button and locate the ```intermediate_CA.crt``` that you want to add to the trust store. Select the file and click ```Open```  
+Click ```Next``` to continue  
+In the next window, choose the option ```Place all certificates in the following store``` and click the ```Browse``` button  
+In the ```Select Certificate Store``` window, choose ```Trusted Root Certification Authorities``` and click ```OK```  
+Click ```Next``` to proceed  
+Review the summary information and click ```Finish``` to complete the import process  
+You should see a confirmation message indicating that the certificate was imported successfully. Click ```OK``` to close the wizard  
+the last massage is just to ensure that the user knows what hes doing and never just add any ```CAs``` to your trusted store all ```CAs``` you need are already in your system  
+the only reason why we want to add our intermediate CA to the trusted store is that its a selfsigned trust chain  
+that means we have created all the certificates by our own and no company or other authority is involved in that chain
 
 ### Add CA's to trusted store on Linux
 for Linux we will create a ```.pem``` file which contains both CAs the intermediate and the root_CA  
@@ -127,7 +142,9 @@ openssl verify -CApath /etc/ssl/certs/ ~/CA_trust_chain.pem
 
 
 ## OpenVPN
-OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
+OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems  
+OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly  
+i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
 
 ### OpenVPN server.conf
 
