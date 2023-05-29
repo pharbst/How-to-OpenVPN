@@ -18,6 +18,12 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 
 
 ## SSL Certificates
+SSL which stands for Secure Soket Layer is a method to create a secure communication between the server and the client with the so called handshake  
+during the handshake the client sends its client certificate to the server and the server sends its server certificate to the client  
+both will now check if the certificate they just recieved is signed by one of the trusted CA or certificate authoritys in their trusted CA store  
+the certificates provide some information who they pretend to be and also a public key to encrypt data but only encrypt the decyption is done with the private key that the server has and the client has also its own private key  
+
+
 ## Create SSL Certificates
 we need at least 4 private keys and certificates  
 2 of them will be certificate authoritys and the other two are for the server and a client  
