@@ -1,10 +1,10 @@
-# VPN
+### VPN
 this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
-pls dont use any certificates provided in this repo cause since the private keys comes with it it's absolutely not save  
+#pls dont use any certificates provided in this repo cause since the private keys comes with it it's absolutely not save  
 
 
 
-# Create ssl Certificates
+## Create ssl Certificates
 we need at least 4 private keys and certificates  
 2 of them will be certificate authoritys and the other two are for the server and a client  
 &emsp;&emsp;root_CA.crt  
@@ -67,5 +67,5 @@ openssl x509 -req -in client.csr -CA intermediate_CA.crt -CAkey intermediate_pri
 all additional clients should get their own certificate and private key to ensure security  
   
   
-# How to add a CA to the trusted CA store for Windows and Linux
+## How to add a CA to the trusted CA store for Windows and Linux
 
