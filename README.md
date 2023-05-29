@@ -46,7 +46,7 @@ this command will create a private key with the rsa algo and a keylength of 4096
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key
 ```
-this will create a private key with the normal keylength of 256bits
+this will create a private key with the normal keylength of 2048bits
 ```bash
 -algorithm RSA
 ```
