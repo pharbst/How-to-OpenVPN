@@ -1,4 +1,4 @@
-# VPN
+# How To OpenVPN
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys are comming with it, it's absolutely not save  
 this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
     
