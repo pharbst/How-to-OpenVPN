@@ -10,7 +10,7 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 ###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
 ###### &emsp;&emsp;1.3.1 [Debian](#Debian)
 ##### 2.0 [OpvenVPN](#OpenVPN)  
-###### &emsp;2.1 [OpenVPN server.conf](#OpenVPN-server.conf)  
+###### &emsp;2.1 [OpenVPN server.conf](#OpenVPN-server-config)  
 ###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
 ###### &emsp;2.3 [Clients](#Clients)  
 ##### 3.0 [Clear the Path](#clear-the-path)  
@@ -159,7 +159,7 @@ OpenVPN provides a huge range of modification what makes it kinda difficult for 
 i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i'll have it ready  
 
 
-### OpenVPN server.conf
+### OpenVPN server config
 the ```server.conf``` file is one of the most important parts here you will configure the whole vpn server its location is normally ```/etc/openvpn``` or ```/etc/openvpn/server```
 
 first we will define a port to be used be the openvpn service ``` port 1194``` is the standart port for increased security you should change it    
