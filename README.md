@@ -156,10 +156,17 @@ openssl verify -CApath /etc/ssl/certs/ ~/CA_trust_chain.pem
 ## OpenVPN
 OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems  
 OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly  
-i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
+i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i'll have it ready  
 
 
 ### OpenVPN server.conf
+the ```server.conf``` file is one of the most important parts here you will configure the whole vpn server its location is normally ```/etc/openvpn``` or ```/etc/openvpn/server```
+
+first we will define a port to be used be the openvpn service ``` port 1194``` is the standart port for increased security you should change it    
+```openvpn
+port 1194
+```
+the config file needs the paths to the ```CA```, the ```server_private.key``` and the ```server.crt```
 
 
 ### OpenVPN Service
