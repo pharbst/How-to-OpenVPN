@@ -1,22 +1,24 @@
 # VPN
-this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys comeing with it, it's absolutely not save  
+this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
     
 
-##### 1.0 [SSL Certificates](#ssl-certificates)  
-###### &emsp;&emsp;1.1 [Create SSL Certificates](#create-ssl-certificates)  
-###### &emsp;&emsp;1.2 add CAs to trusted store on Windows  
-###### &emsp;&emsp;1.3 add CAs to trusted store on Linux  
-##### 3.0 OpenVPN  
-###### &emsp;&emsp;3.1 Openvpn server.conf  
-###### &emsp;&emsp;3.2 Openvpn Service  
-###### &emsp;&emsp;3.3 Clients  
-##### 4.0 clear the path  
-###### &emsp;&emsp;4.1 Firewall  
-###### &emsp;&emsp;4.2 Portforwarding  
-###### &emsp;&emsp;4.3 Portmapping server  
+##### 1.0 [SSL Certificates](#SSL-certificates)  
+###### &emsp;&emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
+###### &emsp;&emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
+###### &emsp;&emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
+##### 3.0 [OpvenVPN](#OpenVPN)  
+###### &emsp;&emsp;3.1 [OpenVPN server.conf](#Openvpn-server.conf)  
+###### &emsp;&emsp;3.2 [Create OpenVPN Service](#Openvpn-Service)  
+###### &emsp;&emsp;3.3 [Clients](#Clients)  
+##### 4.0 [Clear the Path](#clear-the-path)  
+###### &emsp;&emsp;4.1 [Firewall](#Firewall)  
+###### &emsp;&emsp;4.2 [Portforwarding](#Portforwarding)  
+###### &emsp;&emsp;4.3 [Portmapping Server](#Portmapping-server)  
 
-## Create ssl Certificates
+
+## SSL Certificates
+## Create SSL Certificates
 we need at least 4 private keys and certificates  
 2 of them will be certificate authoritys and the other two are for the server and a client  
 &emsp;&emsp;root_CA.crt  
