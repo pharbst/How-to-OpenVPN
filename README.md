@@ -7,6 +7,8 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 ###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
 ###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
 ###### &emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
+###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
+###### &emsp;&emsp;1.3.1 [Debian](#Debian)
 ##### 2.0 [OpvenVPN](#OpenVPN)  
 ###### &emsp;2.1 [OpenVPN server.conf](#Openvpn-server.conf)  
 ###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
@@ -88,8 +90,38 @@ all additional clients should get their own certificate and private key to ensur
   
   
 ### Add CA's to trusted store on Windows
+for Windows we just need the intermediate_CA.crt
 
 ### Add CA's to trusted store on Linux
+for Linux we will create a ```.pem``` file which contains both CAs the intermediate and the root_CA  
+this is done by ```cat intermediate_CA.crt > example.pem && cat root_CA.crt >> example.pem```  
+```example.pem``` should be changed to the name you want only the .pem ending has to stay  
+
+#### Arch and RedHat
+for Arch based and Red Hat based systems we can use the ```trust``` command to add a CA list file to the trusted store
+```bash
+sudo trust anchor --store /path/to/example.pem
+```
+and the ```openssl verify``` command can be used to verify that the CAs are added and verifyed 
+```bash
+openssl verify -CApath /etc/ssl/certs/ path/to/example.pem
+```
+
+#### Debian
+since debian has no ```trust``` command we need to copy the CA certificate into the ```/usr/local/share/ca-certificates/``` folder  
+```bash
+sudo cp ca.crt /usr/local/share/ca-certificates/
+```
+and now we can update the trusted store with ```update-ca-certificates``` like so:
+```bash
+sudo update-ca-certificates
+```
+and the ```openssl verify``` command can be used to verify that the CAs are added and verifyed 
+```bash
+openssl verify -CApath /etc/ssl/certs/ ~/CA_trust_chain.pem
+```
+
+
 
 ## OpenVPN
 OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i have it ready  
