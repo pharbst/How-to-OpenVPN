@@ -10,7 +10,7 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 ###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
 ###### &emsp;&emsp;1.3.1 [Debian](#Debian)
 ##### 2.0 [OpvenVPN](#OpenVPN)  
-###### &emsp;2.1 [OpenVPN server.conf](#OpenVPN-server-config)  
+###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)  
 ###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
 ###### &emsp;2.3 [Clients](#Clients)  
 ##### 3.0 [Clear the Path](#clear-the-path)  
