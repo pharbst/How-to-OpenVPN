@@ -190,14 +190,73 @@ Whether you are new to OpenVPN or seeking a comprehensive resource to refer to i
 
 
 ### OpenVPN server config
-the ```server.conf``` file is one of the most important parts here you will configure the whole vpn server its location is normally ```/etc/openvpn``` or ```/etc/openvpn/server```
+For the OpenVPN `server.conf` there much to know so here is a basic config file:
 
-first we will define a port to be used be the openvpn service ``` port 1194``` is the standart port for increased security you should change it    
-```openvpn
+```config
 port 1194
-```
-the config file needs the paths to the ```CA```, the ```server_private.key``` and the ```server.crt```
+proto tcp
+dev tun
 
+ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem
+cert /etc/openvpn/server/server.crt
+key /etc/openvpn/server/server_private.key
+
+server 192.168.180.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+
+push "redirect-gateway def1"
+push "dhcp-option DNS 8.8.8.8"
+push "dhcp_option DNS 8.8.4.4"
+push "route 192.168.178.0 255.255.255.0"
+
+client-to-client
+keepalive 10 120
+somp-lzo
+user nobody
+
+persist-key
+persist-tun
+
+status openvpn-status.log
+verb3
+```
+1. `port 1194`: This line specifies the port number on which the OpenVPN server will listen for incoming connections. In this case, it is set to `port 1194`.
+
+1. `proto tcp`: This line specifies the transport protocol used by OpenVPN. In this case, it is set to `TCP`.
+
+1. `dev tun`: This line specifies the network device used for the VPN tunnel. In this case, it is set to `tun`.
+
+1. `ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem`: This line specifies the path to the CA (Certificate Authority) certificate file. The CA certificate is used to verify the authenticity of the server's certificate.
+
+1. `cert /etc/openvpn/server/server.crt`: This line specifies the path to the server's certificate file. The server's certificate is used to authenticate the server to the clients.
+
+1. `key /etc/openvpn/server/server_private.key`: This line specifies the path to the server's private key file. The private key is used for cryptographic operations and should be kept secure.
+
+1. `server 192.168.180.0 255.255.255.0`: This line defines the IP address pool for the VPN clients. In this case, it specifies that the server will assign IP addresses from the range 192.168.180.0 to 192.168.180.255 with a netmask of 255.255.255.0.
+
+1. `ifconfig-pool-persist ipp.txt`: This line specifies a file (ipp.txt) where persistent IP address assignments for clients will be stored.
+
+1. `push "redirect-gateway def1"`: This line pushes a route to the client that redirects all of its traffic through the VPN server.
+
+1. `push "dhcp-option DNS 8.8.8.8"` and `push "dhcp-option DNS 8.8.4.4"`: These lines push DNS (Domain Name System) configuration options to the clients. In this case, it sets the DNS servers to Google's public DNS servers (8.8.8.8 and 8.8.4.4).
+
+1. `push "route 192.168.178.0 255.255.255.0"`: This line pushes a specific route to the clients. In this case, it specifies that the clients should route traffic to the network 192.168.178.0/24 through the VPN.
+
+1. `client-to-client`: This line allows communication between connected clients in the VPN. By default, OpenVPN does not allow clients to communicate with each other.
+
+1. `keepalive 10 120`: This line sets the keepalive parameters for the VPN connection. It specifies that a keepalive packet should be sent every 10 seconds, and if no response is received within 120 seconds, the connection will be considered lost.
+
+1. `comp-lzo`: This line enables compression of the VPN traffic using LZO compression algorithm. It helps in reducing the size of data transmitted over the VPN.
+
+1. `user nobody`: This line specifies the user under which the OpenVPN process will run. In this case, it is set to nobody for improved security.
+
+1. `persist-key` and `persist-tun`: These lines instruct OpenVPN to persist the encryption key and tunnel interface across restarts.
+
+1. `status openvpn-status.log`: This line specifies the file where the OpenVPN server will write status information and logging output.
+
+1. `verb 3`: This line sets the verbosity level of OpenVPN logging. A higher value (e.g., 3) provides more detailed log output for troubleshooting purposes.
+
+These lines collectively configure the OpenVPN server with various parameters and settings to establish and manage the VPN connections.
 
 ### OpenVPN Service
 
