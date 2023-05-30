@@ -37,10 +37,10 @@ This encryption and decryption process allows sensitive information, such as log
 ### Create SSL Certificates
 To establish a secure SSL connection, we need four private keys and certificates. Two of them will serve as Certificate Authorities (CAs), while the other two will be used for the server and client respectively. Here are the certificates we aim to create:
 
-	-`root_CA.crt`			: This is the root CA certificate, which acts as a trusted authority to create certificates and other CAs.
-	-`intermediate_CA.crt`	: The intermediate CA certificate can also create certificates and CAs. It is primarily used to generate client and server certificates.
-	-`server.crt`			: The server certificate is specific to the server and will be used to establish its identity during SSL communication.
-	-`client.crt`			: The client certificate is specific to the client and will be used to verify its identity during SSL communication.
+	`root_CA.crt`			: This is the root CA certificate, which acts as a trusted authority to create certificates and other CAs.
+	`intermediate_CA.crt`	: The intermediate CA certificate can also create certificates and CAs. It is primarily used to generate client and server certificates.
+	`server.crt`			: The server certificate is specific to the server and will be used to establish its identity during SSL communication.
+	`client.crt`			: The client certificate is specific to the client and will be used to verify its identity during SSL communication.
 It's important to note that every certificate requires a private key, which should be kept confidential and never shared. Now let's walk through the process of creating these certificates
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key -pkeyopt rsa_keygen_bits:4096
