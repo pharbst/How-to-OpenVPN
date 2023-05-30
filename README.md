@@ -190,7 +190,7 @@ Whether you are new to OpenVPN or seeking a comprehensive resource to refer to i
 
 
 ### OpenVPN server config
-For the OpenVPN `server.conf` there much to know so here is a basic config file:
+For the OpenVPN `server.conf` there's much to know so here is a basic config file:
 
 ```config
 port 1194
@@ -211,7 +211,8 @@ push "route 192.168.178.0 255.255.255.0"
 
 client-to-client
 keepalive 10 120
-somp-lzo
+comp-lzo
+cipher AES-256-CBC
 user nobody
 
 persist-key
@@ -225,7 +226,8 @@ verb3
 1. `proto tcp`: This line specifies the transport protocol used by OpenVPN. In this case, it is set to `TCP`.
 
 1. `dev tun`: This line specifies the network device used for the VPN tunnel. In this case, it is set to `tun`.
-
+   - "tun" is a virtual network tunneling device that operates at the network layer (Layer 3) and is used for routing purposes.
+   - "tap" is a virtual network interface that operates at the data link layer (Layer 2) and is used for creating Ethernet-like bridges and connecting multiple networks together.
 1. `ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem`: This line specifies the path to the CA (Certificate Authority) certificate file. The CA certificate is used to verify the authenticity of the server's certificate.
 
 1. `cert /etc/openvpn/server/server.crt`: This line specifies the path to the server's certificate file. The server's certificate is used to authenticate the server to the clients.
@@ -240,7 +242,7 @@ verb3
 
 1. `push "dhcp-option DNS 8.8.8.8"` and `push "dhcp-option DNS 8.8.4.4"`: These lines push DNS (Domain Name System) configuration options to the clients. In this case, it sets the DNS servers to Google's public DNS servers (8.8.8.8 and 8.8.4.4).
 
-1. `push "route 192.168.178.0 255.255.255.0"`: This line pushes a specific route to the clients. In this case, it specifies that the clients should route traffic to the network 192.168.178.0/24 through the VPN.
+1. `push "route 192.168.178.0 255.255.255.0"`: This line pushes a specific route to the VPN clients, allowing them to access resources in the 192.168.178.0/24 network by routing the traffic through the OpenVPN server. It enables visibility and connectivity between the VPN network (192.168.180.0/24) and the local network (192.168.178.0/24).
 
 1. `client-to-client`: This line allows communication between connected clients in the VPN. By default, OpenVPN does not allow clients to communicate with each other.
 
@@ -248,9 +250,25 @@ verb3
 
 1. `comp-lzo`: This line enables compression of the VPN traffic using LZO compression algorithm. It helps in reducing the size of data transmitted over the VPN.
 
-1. `user nobody`: This line specifies the user under which the OpenVPN process will run. In this case, it is set to nobody for improved security.
+1. `cipher AES-256-CBC` : This line enables encryption for the actual user data (data channel).
+   - `AES-128-CBC` : AES with a 128-bit key in CBC (Cipher Block Chaining) mode.
+   - `AES-192-CBC`: AES with a 192-bit key in CBC mode.
+   - `AES-256-CBC`: AES with a 256-bit key in CBC mode.
+   - `BF-CBC`: Blowfish encryption in CBC mode.
+   - `DES-CBC`: DES (Data Encryption Standard) encryption in CBC mode.
+   - `3DES-CBC`: Triple DES encryption in CBC mode.
+   - `CAMELLIA-128-CBC`: Camellia with a 128-bit key in CBC mode.
+   - `CAMELLIA-192-CBC`: Camellia with a 192-bit key in CBC mode.
+   - `CAMELLIA-256-CBC`: Camellia with a 256-bit key in CBC mode.
+
+	Note that it's recommended to use AES-based ciphers (such as AES-128-CBC or AES-256-CBC) for strong security and performance. Avoid using weaker ciphers like DES or Blowfish unless you have specific compatibility or legacy requirements.
+
+1. `user nobody`: This line specifies the user account under which the OpenVPN process will run. The user account "nobody" is a common convention used to run services with minimal privileges and reduce potential security risks. The "nobody" user typically has limited permissions and access rights, providing an additional layer of security for the OpenVPN process.
 
 1. `persist-key` and `persist-tun`: These lines instruct OpenVPN to persist the encryption key and tunnel interface across restarts.
+   - `persist-key`: This directive allows the OpenVPN server to persistently store the encryption key used for TLS authentication. By enabling persist-key, the server will remember and reuse the same key across client connections, eliminating the need to renegotiate the key for every new connection.
+
+   - `persist-tun`: This directive instructs the OpenVPN server to persistently maintain the tunnel interface (tun or tap) even when the client connection is temporarily interrupted. When persist-tun is enabled, the server will keep the tunnel interface active and maintain its configuration, allowing for seamless reconnection and resumption of VPN communication once the client reconnects.
 
 1. `status openvpn-status.log`: This line specifies the file where the OpenVPN server will write status information and logging output.
 
