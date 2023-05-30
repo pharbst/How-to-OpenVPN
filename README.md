@@ -204,21 +204,25 @@ key /etc/openvpn/server/server_private.key
 server 192.168.180.0 255.255.255.0
 ifconfig-pool-persist ipp.txt
 
+client-config-dir /etc/openvpn/server/ccd
+client-to-client
+duplicate-cn
+
 push "redirect-gateway def1"
 push "dhcp-option DNS 8.8.8.8"
 push "dhcp_option DNS 8.8.4.4"
 push "route 192.168.178.0 255.255.255.0"
 
-client-to-client
 keepalive 10 120
-comp-lzo
 cipher AES-256-CBC
+comp-lzo
 user nobody
 
 persist-key
 persist-tun
 
-status openvpn-status.log
+status /var/log/openvpn/status.log
+log-append /var/log/openvpn/openvpn.log
 verb3
 ```
 1. `port 1194`: This line specifies the port number on which the OpenVPN server will listen for incoming connections. In this case, it is set to `port 1194`.
@@ -238,17 +242,20 @@ verb3
 
 1. `ifconfig-pool-persist ipp.txt`: This line specifies a file (ipp.txt) where persistent IP address assignments for clients will be stored.
 
+1. `client-config-dir /etc/openvpn/server/ccd` : This line sets the directory to save client configurations.
+
+1. `client-to-client`: This line allows communication between connected clients in the VPN. By default, OpenVPN does not allow clients to communicate with each other.
+
+1. `duplicate-cn` : This line allows clients to log in with multiple devices at the same time.
+
 1. `push "redirect-gateway def1"`: This line pushes a route to the client that redirects all of its traffic through the VPN server.
 
 1. `push "dhcp-option DNS 8.8.8.8"` and `push "dhcp-option DNS 8.8.4.4"`: These lines push DNS (Domain Name System) configuration options to the clients. In this case, it sets the DNS servers to Google's public DNS servers (8.8.8.8 and 8.8.4.4).
 
 1. `push "route 192.168.178.0 255.255.255.0"`: This line pushes a specific route to the VPN clients, allowing them to access resources in the 192.168.178.0/24 network by routing the traffic through the OpenVPN server. It enables visibility and connectivity between the VPN network (192.168.180.0/24) and the local network (192.168.178.0/24).
 
-1. `client-to-client`: This line allows communication between connected clients in the VPN. By default, OpenVPN does not allow clients to communicate with each other.
 
 1. `keepalive 10 120`: This line sets the keepalive parameters for the VPN connection. It specifies that a keepalive packet should be sent every 10 seconds, and if no response is received within 120 seconds, the connection will be considered lost.
-
-1. `comp-lzo`: This line enables compression of the VPN traffic using LZO compression algorithm. It helps in reducing the size of data transmitted over the VPN.
 
 1. `cipher AES-256-CBC` : This line enables encryption for the actual user data (data channel).
    - `AES-128-CBC` : AES with a 128-bit key in CBC (Cipher Block Chaining) mode.
@@ -262,6 +269,8 @@ verb3
    - `CAMELLIA-256-CBC`: Camellia with a 256-bit key in CBC mode.
 
 	Note that it's recommended to use AES-based ciphers (such as AES-128-CBC or AES-256-CBC) for strong security and performance. Avoid using weaker ciphers like DES or Blowfish unless you have specific compatibility or legacy requirements.
+
+1. `comp-lzo`: This line enables compression of the VPN traffic using LZO compression algorithm. It helps in reducing the size of data transmitted over the VPN.
 
 1. `user nobody`: This line specifies the user account under which the OpenVPN process will run. The user account "nobody" is a common convention used to run services with minimal privileges and reduce potential security risks. The "nobody" user typically has limited permissions and access rights, providing an additional layer of security for the OpenVPN process.
 
