@@ -1,6 +1,6 @@
 # How To OpenVPN
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys are comming with it, it's absolutely not save  
-this is my repo with all the nesessary files to set up a openvpn server but all the files are just for testing purpose and wont be used in real serverapplications  
+This is an introduction for setting up an OpenVPN server step by step  
     
 
 ##### 1.0 [SSL Certificates](#SSL-certificates)  
@@ -8,7 +8,7 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 ###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
 ###### &emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
 ###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
-###### &emsp;&emsp;1.3.1 [Debian](#Debian)
+###### &emsp;&emsp;1.3.2 [Debian](#Debian)
 ##### 2.0 [OpvenVPN](#OpenVPN)  
 ###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)  
 ###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
@@ -22,26 +22,26 @@ this is my repo with all the nesessary files to set up a openvpn server but all 
 
 
 ## SSL Certificates
-SSL which stands for Secure Socket Layer is a method to create a secure communication between the server and the client with the so called handshake  
-during the handshake the client sends its client certificate to the server and the server sends its server certificate to the client  
-both will now check if the certificate they just recieved is signed by one of the trusted CA or certificate authoritys in their trusted CA store  
-the certificates provide some information who they pretend to be and also a public key to encrypt data but only encrypt the decyption is done with the private key that the server has and the client has also its own private key  
+SSL (Secure Socket Layer) is a widely used protocol for establishing a secure communication channel between a server and a client. It stands for Secure Socket Layer. SSL is primarily used to ensure the confidentiality, integrity, and authenticity of data transmitted over the internet.
+
+In simple terms, SSL works as follows: when a client and a server initiate a connection, they exchange digital certificates. The client sends its certificate to the server, and the server sends its certificate to the client. Both the client and server verify these certificates against trusted Certificate Authorities (CAs) stored on their systems.
+
+The certificates contain important information about the entity they represent and include a public key. This public key is used to encrypt data during transmission. Only the corresponding private key, held by the server or the client, can decrypt the encrypted data.
+
+By confirming the certificates with trusted CAs and utilizing encryption with public keys, SSL ensures that the communication between the client and server is secure and protected from unauthorized access or tampering.
+
+This encryption and decryption process allows sensitive information, such as login credentials or financial data, to be transmitted securely over the internet, providing users with peace of mind and protecting their data from potential threats.
 
 
 
 ### Create SSL Certificates
-we need at least 4 private keys and certificates  
-2 of them will be certificate authoritys and the other two are for the server and a client  
-&emsp;&emsp;root_CA.crt  
-&emsp;&emsp;intermediate_CA.crt  
-&emsp;&emsp;server.crt  
-&emsp;&emsp;client.crt  
-these are the certificates we wanna create  
-the root_ca is a certificate authority to create certificates and also certificate authoritys  
-the intermediate could also create certificate authoritys but is mainly used to create client and server certificates  
-every certificate needs a private key to work this privat key should be always kept save and never be shared  
-to create our root_ca.crt we first need to create a privat key which is the root of our selfsigned trustchain so store is save  
-the same appies for the intermediate privat key
+To establish a secure SSL connection, we need four private keys and certificates. Two of them will serve as Certificate Authorities (CAs), while the other two will be used for the server and client respectively. Here are the certificates we aim to create:
+
+	-`root_CA.crt`			: This is the root CA certificate, which acts as a trusted authority to create certificates and other CAs.
+	-`intermediate_CA.crt`	: The intermediate CA certificate can also create certificates and CAs. It is primarily used to generate client and server certificates.
+	-`server.crt`			: The server certificate is specific to the server and will be used to establish its identity during SSL communication.
+	-`client.crt`			: The client certificate is specific to the client and will be used to verify its identity during SSL communication.
+It's important to note that every certificate requires a private key, which should be kept confidential and never shared. Now let's walk through the process of creating these certificates
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key -pkeyopt rsa_keygen_bits:4096
 ```
