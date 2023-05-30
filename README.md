@@ -41,122 +41,152 @@ To establish a secure SSL connection, we need four private keys and certificates
 - `intermediate_CA.crt`	: The intermediate CA certificate can also create certificates and CAs. It is primarily used to generate client and server certificates.
 - `server.crt`			: The server certificate is specific to the server and will be used to establish its identity during SSL communication.
 - `client.crt`			: The client certificate is specific to the client and will be used to verify its identity during SSL communication.
+
 It's important to note that every certificate requires a private key, which should be kept confidential and never shared. Now let's walk through the process of creating these certificates
+
+
+To create our private keys we can use this command which generates us a private key with the `RSA` algorithm and a keylength of 4096bits
+
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key -pkeyopt rsa_keygen_bits:4096
 ```
-this command will create a private key with the rsa algo and a keylength of 4096 bits
+
+if you want the standard keylength you can either use `-pkeyopt rsa_keygen_bits:2048` or since 2048 is the standard size just this command:
+
 ```bash
 openssl genpkey -algorithm RSA -out private_key.key
 ```
-this will create a private key with the normal keylength of 2048bits
-```bash
--algorithm RSA
-```
-this is for setting the algorithm with which the key should be generated  
-so for me i wanna have it save and i will create all my keys with a length of 4096 bits  
-  
-you can create directly 4 keys than you have the keys you need one of them is the key for the root CA the second one is the key for the intermediate CA  
-the 3rd for the server and the 4th for the client  
 
-to create the root_CA.crt we can use this command  
+with the first command i will now generate at least 4 keys:
+- `root_private.key`
+- `intermediate_private.key`
+- `server_private.key`
+- `<client name>_private.key` : for me it would be `peter_private.key`
+
+After generating our private keys we need to create the root_CA.crt first to sign other certificates with it.
+This is done by this command:
 ```bash
-openssl req -x509 -new -nodes -key private_key.key -sha256 -days 365 -out root_CA.crt
+openssl req -x509 -new -nodes -key root_private.key -sha256 -days 365 -out root_CA.crt
 ```
-of course you need to adjust the private key variable and you can name the output certificate as you want and the ```-days``` can be set to the wanted value as well  
+- `root_private.key` : if the `.key` is in your current working directory otherwise it needs to be the path to the `.key`.
+- `root_CA.crt` : you can name it as you want.
+- `-days 365` : this can be set to any value it is for how long the CA is valid so after 1 year you have to generate new certificates.
 
 so now we have our root_CA.crt  
 
-next step is to create the intermediate CA wihich has to be signed by our root_CA and root_private key
+Next step is to create the `intermediate_CA.crt`.
+For that we first need to create a signing request `.csr`.
+This is done with the following command:
 
 ```bash
-openssl req -new -key intermediate_private_key.key -out intermediate.csr
+openssl req -new -key intermediate_private.key -out intermediate_CA.csr
 ```
-this will create a signing request file with the csr file extention  
+To actually sign this `.csr` file with our `root_CA.crt` and `root_private.key` we use this command:
 ```bash
-openssl x509 -req -in intermediate.csr -CA root_CA.crt -CAkey root_private_key.key -CAcreateserial -out intermediate_ca.crt -days 365 -sha256
+openssl x509 -req -in intermediate_CA.csr -CA root_CA.crt -CAkey root_private.key -CAcreateserial -out intermediate_CA.crt -days 365 -sha256
 ```
-this will sign the request and creates the new intermediate certificate authority  
+- `-in`		: the signing request file `.csr`.
+- `-CA`		: the `root_CA.crt` or other CA we wanna sign it with.
+- `-CAkey`	: the private key of the CA.
+- `-out`	: again you can name it as you want.
+- `-days`	: again the duration how long the certificate is valid.
 
-for the server certificate it will be the same procedure  
+Now we have our CA's ready to go.
+We now need to create the `server.crt` and `client.crt` in my case the `peter.crt`.
 ```bash
 openssl req -new -key server_private.key -out server.csr
 openssl x509 -req -in server.csr -CA intermediate_CA.crt -CAkey intermediate_private.key -CAcreateserial -out server.crt -days 365 -sha256
-```
-and for the client as well
-```bash
-openssl req -new -key client_private.key -out client.csr
-openssl x509 -req -in client.csr -CA intermediate_CA.crt -CAkey intermediate_private.key -CAcreateserial -out client.crt -days 365 -sha256
+
+openssl req -new -key peter_private.key -out peter.csr
+openssl x509 -req -in peter.csr -CA intermediate_CA.crt -CAkey intermediate_private.key -CAcreateserial -out peter.crt -days 365 -sha256
 ```
 
-all additional clients should get their own certificate and private key to ensure security  
-
-
+For all additional clients it's the same they need a privte key and a `.crt` signe by the `intermediate_CA.crt`.
 
 
 ### Add CA's to trusted store on Windows
-for Windows we just need the intermediate_CA.crt  
-press "Windows key" and search for Manage user certificates  
+To add the intermediate_CA.crt to the trusted store on Windows, follow these steps:
 
-In the ```Certificates - Current User``` window, navigate to the ```Trusted Root Certification Authorities``` folder in the left-hand pane  
-Right-click on the ```Trusted Root Certification Authorities``` folder and select ```All Tasks``` -> ```Import```  
-The Certificate Import Wizard will open. Click ```Next``` to proceed  
-Click the ```Browse``` button and locate the ```intermediate_CA.crt``` that you want to add to the trust store. Select the file and click ```Open```  
-Click ```Next``` to continue  
-In the next window, choose the option ```Place all certificates in the following store``` and click the ```Browse``` button  
-In the ```Select Certificate Store``` window, choose ```Trusted Root Certification Authorities``` and click ```OK```  
-Click ```Next``` to proceed  
-Review the summary information and click ```Finish``` to complete the import process  
-You should see a confirmation message indicating that the certificate was imported successfully. Click ```OK``` to close the wizard  
-the last massage is just to ensure that the user knows what hes doing and never just add any ```CAs``` to your trusted store all ```CAs``` you need are already in your system  
-the only reason why we want to add our intermediate CA to the trusted store is that its a selfsigned trust chain  
-that means we have created all the certificates by our own and no company or other authority is involved in that chain
+1. Press the "Windows key" and search for "Manage user certificates."
 
+2. In the "Certificates - Current User" window, navigate to the "Trusted Root Certification Authorities" folder in the left-hand pane.
 
+3. Right-click on the "Trusted Root Certification Authorities" folder and select "All Tasks" -> "Import."
+
+4. The Certificate Import Wizard will open. Click "Next" to proceed.
+
+5. Click the "Browse" button and locate the intermediate_CA.crt file that you want to add to the trust store. Select the file and click "Open."
+
+6. Click "Next" to continue.
+
+7. In the next window, choose the option "Place all certificates in the following store" and click the "Browse" button.
+
+8. In the "Select Certificate Store" window, choose "Trusted Root Certification Authorities" and click "OK."
+
+9. Click "Next" to proceed.
+
+10. Review the summary information and click "Finish" to complete the import process.
+
+11. You should see a confirmation message indicating that the certificate was imported successfully. Click "OK" to close the wizard.
+
+It's important to note that you should be cautious when adding CAs to your trusted store. Only add CAs that you trust and are necessary for your specific use case. In this scenario, we are adding the intermediate CA to the trusted store because it is part of a self-signed trust chain. This means that we have created all the certificates ourselves, and no external company or authority is involved in that chain.
+
+By following these steps, you can add the intermediate_CA.crt to the trusted store on your Windows system, ensuring that SSL connections using certificates signed by this intermediate CA are recognized as trusted.
 
 
 ### Add CA's to trusted store on Linux
-for Linux we will create a ```.pem``` file which contains both CAs the intermediate and the root_CA  
-this is done by  
+For Linux we will create a ```.pem``` file which contains both CAs the `intermediate_CA.crt` and the `root_CA.crt`. This is done by:
 ```bash
-cat intermediate_CA.crt > example.pem && cat root_CA.crt >> example.pem
+cat intermediate_CA.crt > peters_selfsigned_trust_chain.pem && cat root_CA.crt >> peters_selfsigned_trust_chain.pem
 ```  
-```example.pem``` should be changed to the name you want only the .pem ending has to stay  
-
+Name it as you like.
 
 
 #### Arch and RedHat
-for Arch based and Red Hat based systems we can use the ```trust``` command to add a CA list file to the trusted store
+For Arch-based and Red Hat-based systems, you can use the `trust` command to add a CA list file to the trusted store. Follow these steps:
 ```bash
-sudo trust anchor --store /path/to/example.pem
+sudo trust anchor --store /path/to/peters_selfsigned_trust_chain.pem
 ```
-and the ```openssl verify``` command can be used to verify that the CAs are added and verifyed 
+Replace `/path/to/peters_selfsigned_trust_chain.pem` with the actual path to your CA list file.
+
+After adding the CA list file, you can use the openssl verify command to verify that the CAs are added and validated correctly:
 ```bash
-openssl verify -CApath /etc/ssl/certs/ path/to/example.pem
+openssl verify -CApath /etc/ssl/certs/ /path/to/peters_selfsigned_trust_chain.pem
 ```
+Ensure to replace `/path/to/peters_selfsigned_trust_chain.pem` with the actual path to your CA list file.
+
+By running this command, OpenSSL will check the certificates in the specified CA path (`/etc/ssl/certs/` in this case) and verify the trust chain using the CA list file (`peters_selfsigned_trust_chain.pem` in this case). This verification process ensures that the CAs are added to the trusted store and can be used for certificate validation.
+
 
 #### Debian
-since debian has no ```trust``` command we need to copy the CA certificate into the ```/usr/local/share/ca-certificates/``` folder  
+On Debian systems, you can manually add the CA certificate to the trusted store by following these steps:
+
+1. Copy the CA certificate (`peters_selfsigned_trust_chain.pem` in this example) to the `/usr/local/share/ca-certificates/` folder:
 ```bash
-sudo cp ca.crt /usr/local/share/ca-certificates/
+sudo cp peters_selfsigned_trust_chain.pem /usr/local/share/ca-certificates/
 ```
-and now we can update the trusted store with ```update-ca-certificates``` like so:
+2. Update the trusted store using the `update-ca-certificates` command:
 ```bash
 sudo update-ca-certificates
 ```
-and the ```openssl verify``` command can be used to verify that the CAs are added and verifyed 
+This command updates the trusted store with the CA certificate you copied to the specified folder.
+
+After updating the trusted store, you can use the `openssl verify` command to verify that the CAs are added and correctly validated:
 ```bash
-openssl verify -CApath /etc/ssl/certs/ ~/CA_trust_chain.pem
+openssl verify -CApath /etc/ssl/certs/ peters_selfsigned_trust_chain.pem
 ```
 
 
-
-
-
 ## OpenVPN
-OpenVPN is a opensource programm to create vpn servers and there is also a openvpn client software for all operating systems  
-OpenVPN provides a huge range of modification what makes it kinda difficult for normalos to set it up properly  
-i struggled by my self a lot thats why im writing this documentation and also if i need it again in the future i'll have it ready  
+OpenVPN is a powerful open-source program designed for creating VPN servers and establishing secure connections between networks or remote devices. It offers comprehensive features and is compatible with various operating systems, providing an OpenVPN client software for easy setup and usage.
+
+With OpenVPN, you have complete control over the configuration and customization of your VPN setup. This flexibility allows you to tailor the VPN to your specific needs, whether it's for enhancing privacy and security, accessing restricted content, or connecting remote offices securely.
+
+While OpenVPN's versatility is advantageous, it can be challenging for those unfamiliar with VPN technologies to set up and configure correctly. However, with proper documentation and guidance, you can overcome these difficulties and successfully deploy an OpenVPN solution.
+
+This documentation aims to provide a step-by-step guide, sharing knowledge and best practices to simplify the OpenVPN setup process. By following the instructions and explanations provided, you can confidently create and manage your OpenVPN server, configure clients, and ensure a secure and reliable VPN connection.
+
+Whether you are new to OpenVPN or seeking a comprehensive resource to refer to in the future, this documentation will serve as a valuable reference to help you navigate the complexities of OpenVPN configuration and deployment effectively.
 
 
 ### OpenVPN server config
