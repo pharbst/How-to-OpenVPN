@@ -1,14 +1,15 @@
 # How To OpenVPN
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys are comming with it, it's absolutely not save  
 This is an introduction for setting up an OpenVPN server step by step  
-    
+	 
 
 ##### 1.0 [SSL Certificates](#SSL-certificates)  
 ###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
 ###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
-###### &emsp;1.3 [Add Ca's on Linux](#add-CAs-to-trusted-store-on-Linux)  
+###### &emsp;1.3 [Add CA's on Linux](#add-CAs-to-trusted-store-on-Linux)  
 ###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
 ###### &emsp;&emsp;1.3.2 [Debian](#Debian)
+###### &emsp; 1.4 [Add CA's on Android](#add-CAs-to-trusted-store-on-Android)
 ##### 2.0 [OpvenVPN](#OpenVPN)  
 ###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)  
 ###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
@@ -176,6 +177,9 @@ After updating the trusted store, you can use the `openssl verify` command to ve
 openssl verify -CApath /etc/ssl/certs/ peters_selfsigned_trust_chain.pem
 ```
 
+#### Add CA's to trusted store on Android
+On Android devices you can go into the settings and scroll down until you find security settings you have to dig through there a bit to find a setting called add certificate or simular. The CA has to be on your phone of course. 
+
 
 ## OpenVPN
 OpenVPN is a powerful open-source program designed for creating VPN servers and establishing secure connections between networks or remote devices. It offers comprehensive features and is compatible with various operating systems, providing an OpenVPN client software for easy setup and usage.
@@ -196,10 +200,12 @@ For the OpenVPN `server.conf` there's much to know so here is a basic config fil
 port 1194
 proto tcp
 dev tun
+topology subnet
 
 ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem
 cert /etc/openvpn/server/server.crt
 key /etc/openvpn/server/server_private.key
+dh /etc/openvpn/server/dh.pem
 
 server 192.168.180.0 255.255.255.0
 ifconfig-pool-persist ipp.txt
@@ -214,24 +220,23 @@ push "dhcp_option DNS 8.8.4.4"
 push "route 192.168.178.0 255.255.255.0"
 
 keepalive 10 120
-cipher AES-256-CBC
-comp-lzo
 user nobody
+group nobody
 
 persist-key
 persist-tun
 
 status /var/log/openvpn/status.log
 log-append /var/log/openvpn/openvpn.log
-verb3
+verb 3
 ```
 1. `port 1194`: This line specifies the port number on which the OpenVPN server will listen for incoming connections. In this case, it is set to `port 1194`.
 
 1. `proto tcp`: This line specifies the transport protocol used by OpenVPN. In this case, it is set to `TCP`.
 
 1. `dev tun`: This line specifies the network device used for the VPN tunnel. In this case, it is set to `tun`.
-   - "tun" is a virtual network tunneling device that operates at the network layer (Layer 3) and is used for routing purposes.
-   - "tap" is a virtual network interface that operates at the data link layer (Layer 2) and is used for creating Ethernet-like bridges and connecting multiple networks together.
+	- "tun" is a virtual network tunneling device that operates at the network layer (Layer 3) and is used for routing purposes.
+	- "tap" is a virtual network interface that operates at the data link layer (Layer 2) and is used for creating Ethernet-like bridges and connecting multiple networks together.
 1. `ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem`: This line specifies the path to the CA (Certificate Authority) certificate file. The CA certificate is used to verify the authenticity of the server's certificate.
 
 1. `cert /etc/openvpn/server/server.crt`: This line specifies the path to the server's certificate file. The server's certificate is used to authenticate the server to the clients.
@@ -257,27 +262,12 @@ verb3
 
 1. `keepalive 10 120`: This line sets the keepalive parameters for the VPN connection. It specifies that a keepalive packet should be sent every 10 seconds, and if no response is received within 120 seconds, the connection will be considered lost.
 
-1. `cipher AES-256-CBC` : This line enables encryption for the actual user data (data channel).
-   - `AES-128-CBC` : AES with a 128-bit key in CBC (Cipher Block Chaining) mode.
-   - `AES-192-CBC`: AES with a 192-bit key in CBC mode.
-   - `AES-256-CBC`: AES with a 256-bit key in CBC mode.
-   - `BF-CBC`: Blowfish encryption in CBC mode.
-   - `DES-CBC`: DES (Data Encryption Standard) encryption in CBC mode.
-   - `3DES-CBC`: Triple DES encryption in CBC mode.
-   - `CAMELLIA-128-CBC`: Camellia with a 128-bit key in CBC mode.
-   - `CAMELLIA-192-CBC`: Camellia with a 192-bit key in CBC mode.
-   - `CAMELLIA-256-CBC`: Camellia with a 256-bit key in CBC mode.
-
-	Note that it's recommended to use AES-based ciphers (such as AES-128-CBC or AES-256-CBC) for strong security and performance. Avoid using weaker ciphers like DES or Blowfish unless you have specific compatibility or legacy requirements.
-
-1. `comp-lzo`: This line enables compression of the VPN traffic using LZO compression algorithm. It helps in reducing the size of data transmitted over the VPN.
-
 1. `user nobody`: This line specifies the user account under which the OpenVPN process will run. The user account "nobody" is a common convention used to run services with minimal privileges and reduce potential security risks. The "nobody" user typically has limited permissions and access rights, providing an additional layer of security for the OpenVPN process.
 
 1. `persist-key` and `persist-tun`: These lines instruct OpenVPN to persist the encryption key and tunnel interface across restarts.
-   - `persist-key`: This directive allows the OpenVPN server to persistently store the encryption key used for TLS authentication. By enabling persist-key, the server will remember and reuse the same key across client connections, eliminating the need to renegotiate the key for every new connection.
+	- `persist-key`: This directive allows the OpenVPN server to persistently store the encryption key used for TLS authentication. By enabling persist-key, the server will remember and reuse the same key across client connections, eliminating the need to renegotiate the key for every new connection.
 
-   - `persist-tun`: This directive instructs the OpenVPN server to persistently maintain the tunnel interface (tun or tap) even when the client connection is temporarily interrupted. When persist-tun is enabled, the server will keep the tunnel interface active and maintain its configuration, allowing for seamless reconnection and resumption of VPN communication once the client reconnects.
+	- `persist-tun`: This directive instructs the OpenVPN server to persistently maintain the tunnel interface (tun or tap) even when the client connection is temporarily interrupted. When persist-tun is enabled, the server will keep the tunnel interface active and maintain its configuration, allowing for seamless reconnection and resumption of VPN communication once the client reconnects.
 
 1. `status openvpn-status.log`: This line specifies the file where the OpenVPN server will write status information and logging output.
 
@@ -286,14 +276,57 @@ verb3
 These lines collectively configure the OpenVPN server with various parameters and settings to establish and manage the VPN connections.
 
 ### OpenVPN Service
+To create a service for OpenVPN we need to create the `.service` file in this directory `/etc/systemd/system/` i will call my `.service` file `openvpn.service`.
+```bash
+sudo nano /etc/systemd/system/openvpn.service
+```
+Now we need to write or copy paste these information in the file.
+```plaintext
+[Unit]
+Description=OpenVPN service
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/openvpn --config /etc/openvpn/server/server.conf --data-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC
+Restart=always
+WorkingDirectory=/etc/openvpn/server
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- `[Unit]` : This section contains metadata and dependencies for the service unit.
+
+- `Description=OpenVPN service` : Provides a description for the service, which will be displayed when managing the service.
+
+- `After=network.target` : Specifies that the service should start after the network subsystem is up and running.
+
+- `[Service]` : This section configures the behavior of the service.
+
+- `ExecStart` : Specifies the command to start the OpenVPN service. It runs the openvpn executable with the `--config` option to provide the path to the server configuration file (`/etc/openvpn/server/server.conf`). Additionally, the `--data-ciphers` option is used to define the allowed encryption ciphers for data transmission.
+
+	- `AES-128-CBC`, `AES-128-GCM`, `AES-256-CBC`, `AES-256-GCM` : These are AES (Advanced Encryption Standard) cipher methods with different key lengths and operating modes. AES-128 uses a 128-bit key, and AES-256 uses a 256-bit key. CBC (Cipher Block Chaining) is a block cipher mode, while GCM (Galois/Counter Mode) provides authenticated encryption.
+	- `BF-CBC`: Blowfish encryption in CBC mode.
+	- `DES-CBC` : DES (Data Encryption Standard) encryption in CBC mode.
+	- `3DES-CBC` : Triple DES encryption in CBC mode.
+	- `CAMELLIA-128-CBC`, `CAMELLIA-192-CBC`, `CAMELLIA-256-CBC`: Camellia cipher methods with different key lengths in CBC mode.
+- `Restart=always` : Indicates that the service should be automatically restarted if it stops unexpectedly.
+
+- `WorkingDirectory=/etc/openvpn/server` : Sets the working directory for the service to /etc/openvpn/server.
+
+- `[Install]` : This section specifies the installation-related settings for the service.
+
+- `WantedBy=multi-user.target` : Indicates that the service should be enabled and started when the system reaches the multi-user target, which is the normal operating mode for most systems.
+
+Please note that the choice of cipher methods should align with the security requirements of your VPN deployment. It is important to consider the balance between security and performance, as stronger ciphers may require more processing power. The cipher methods listed in the example provide a range of options with varying key lengths and operating modes to accommodate different security needs.
 
 
 ### Clients
 
 
 ## Clear the path
-this chapter is about how to portforwarding open ports in the firewall and also what to do when you have no public ipv4 address only a ipv6 which is reachable from outside. for example if your ipv4 is tunneled via DSlite through your ipv6
-
+If you want to have a connection from your local network to the vpn network you have to add a static route in your routers routing table.
+The way to achive that differs with every router normally there should be a setting in the network section to add static ipv4 routes.
 
 
 ### Firewall
