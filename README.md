@@ -1,23 +1,27 @@
 # How To OpenVPN
 ### ⚠️ pls dont use any certificates provided in this repo cause since the private keys are comming with it, it's absolutely not save  
-This is an introduction for setting up an OpenVPN server step by step  
-	 
+This is an introduction for setting up an OpenVPN server step by step...
 
-##### 1.0 [SSL Certificates](#SSL-certificates)  
-###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)  
-###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)  
-###### &emsp;1.3 [Add CA's on Linux](#add-CAs-to-trusted-store-on-Linux)  
-###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-RedHat)
+I'm doing it on an arch based system so if something does not work pls let me know to add information and provide help.
+
+
+## Chapter overview
+##### 1.0 [SSL Certificates](#SSL-certificates)
+###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)
+###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)
+###### &emsp;1.3 [Add CA's on Linux](#add-CAs-to-trusted-store-on-Linux)
+###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-Red-Hat)
 ###### &emsp;&emsp;1.3.2 [Debian](#Debian)
 ###### &emsp; 1.4 [Add CA's on Android](#add-CAs-to-trusted-store-on-Android)
-##### 2.0 [OpvenVPN](#OpenVPN)  
-###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)  
-###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)  
-###### &emsp;2.3 [Clients](#Clients)  
-##### 3.0 [Clear the Path](#clear-the-path)  
-###### &emsp;3.1 [Firewall](#Firewall)  
-###### &emsp;3.2 [Portforwarding](#Portforwarding)  
-###### &emsp;3.3 [Portmapping Server](#Portmapping-server)  
+##### 2.0 [OpvenVPN](#OpenVPN)
+###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)
+###### &emsp;2.2 [Create OpenVPN Service](#Openvpn-Service)
+###### &emsp;2.3 [Clients](#Clients)
+##### 3.0 [Clear the Path](#clear-the-path)
+###### &emsp;3.1 [Routes](#Routes)
+###### &emsp;3.2 [Firewall](#Firewall)
+###### &emsp;3.3 [Portforwarding](#Portforwarding)
+###### &emsp;3.4 [Portmapping Server](#Portmapping-server)
 
 
 
@@ -143,7 +147,7 @@ cat intermediate_CA.crt > peters_selfsigned_trust_chain.pem && cat root_CA.crt >
 Name it as you like.
 
 
-#### Arch and RedHat
+#### Arch and Red Hat
 For Arch-based and Red Hat-based systems, you can use the `trust` command to add a CA list file to the trusted store. Follow these steps:
 ```bash
 sudo trust anchor --store /path/to/peters_selfsigned_trust_chain.pem
@@ -325,9 +329,21 @@ Please note that the choice of cipher methods should align with the security req
 
 
 ## Clear the path
-If you want to have a connection from your local network to the vpn network you have to add a static route in your routers routing table.
-The way to achive that differs with every router normally there should be a setting in the network section to add static ipv4 routes.
+In this chapter we will configure the local network
 
+
+### Routes
+For a simple explanation we fist need to be on the same level how the network looks like.
+So here is a quick example how it looks like.  
+I assume there are at least 3 devices in the local network:
+- Router
+- Your Workstation
+- Server
+For my explanation the `Router` has the ip address `192.168.178.1`,  
+the `Workstation` has the ip address `192.168.178.3` and  
+the `Server` has the ip address `192.168.178.2`.
+
+Additionally the `Server` has a second network interface from the `openvpn.service` which is called `tun1` by default and this interface has the ip address.  
 
 ### Firewall
 
