@@ -177,7 +177,7 @@ After updating the trusted store, you can use the `openssl verify` command to ve
 openssl verify -CApath /etc/ssl/certs/ peters_selfsigned_trust_chain.pem
 ```
 
-#### Add CA's to trusted store on Android
+### Add CA's to trusted store on Android
 On Android devices you can go into the settings and scroll down until you find security settings you have to dig through there a bit to find a setting called add certificate or simular. The CA has to be on your phone of course. 
 
 
