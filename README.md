@@ -8,10 +8,11 @@ I'm doing it on an arch based system so if something does not work pls let me kn
 ## Chapter overview
 ##### 1.0 [SSL Certificates](#SSL-certificates)
 ###### &emsp;1.1 [Create SSL Certificates](#create-SSL-certificates)
-###### &emsp;1.2 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)
-###### &emsp;1.3 [Add CA's on Linux](#add-CAs-to-trusted-store-on-Linux)
-###### &emsp;&emsp;1.3.1 [Arch and RedHat](#Arch-and-Red-Hat)
-###### &emsp;&emsp;1.3.2 [Debian](#Debian)
+###### &emsp;1.2 [Create DH Parameters](#Create-DH-Parameters)
+###### &emsp;1.3 [Add CA's on Windows](#add-CAs-to-trusted-store-on-Windows)
+###### &emsp;1.4 [Add CA's on Linux](#add-CAs-to-trusted-store-on-Linux)
+###### &emsp;&emsp;1.4.1 [Arch and RedHat](#Arch-and-Red-Hat)
+###### &emsp;&emsp;1.4.2 [Debian](#Debian)
 ###### &emsp; 1.4 [Add CA's on Android](#add-CAs-to-trusted-store-on-Android)
 ##### 2.0 [OpvenVPN](#OpenVPN)
 ###### &emsp;2.1 [OpenVPN server config](#OpenVPN-server-config)
@@ -107,6 +108,17 @@ openssl x509 -req -in peter.csr -CA intermediate_CA.crt -CAkey intermediate_priv
 ```
 
 For all additional clients it's the same they need a privte key and a `.crt` signe by the `intermediate_CA.crt`.
+
+### Create DH Parameters
+During the key exchange process in OpenVPN, a DH (Diffie-Hellman) parameter file is used to establish a secure shared secret key between the server and clients. This key is utilized for encryption and decryption of the VPN traffic. The DH parameters ensure that the key exchange process is secure and resistant to cryptographic attacks.
+
+To generate a DH parameter file, you can use the following command:
+```bash
+openssl dhparam -out dh.pem 2048
+```
+The -out dh.pem option specifies the output file name, and 2048 represents the bit size of the DH parameters. A higher bit size (e.g., 2048 or 4096) is recommended for enhanced security, although it increases the computational resources required for encryption and decryption.
+
+Generating the DH parameter file takes some time so get yourself a coffee.
 
 
 ### Add CA's to trusted store on Windows
@@ -212,9 +224,7 @@ key /etc/openvpn/server/server_private.key
 dh /etc/openvpn/server/dh.pem
 
 server 192.168.180.0 255.255.255.0
-ifconfig-pool-persist ipp.txt
 
-client-config-dir /etc/openvpn/server/ccd
 client-to-client
 duplicate-cn
 
@@ -223,6 +233,7 @@ push "dhcp-option DNS 8.8.8.8"
 push "dhcp_option DNS 8.8.4.4"
 push "route 192.168.178.0 255.255.255.0"
 
+cipher AES-256-GCM
 keepalive 10 120
 user nobody
 group nobody
@@ -241,11 +252,16 @@ verb 3
 1. `dev tun`: This line specifies the network device used for the VPN tunnel. In this case, it is set to `tun`.
 	- "tun" is a virtual network tunneling device that operates at the network layer (Layer 3) and is used for routing purposes.
 	- "tap" is a virtual network interface that operates at the data link layer (Layer 2) and is used for creating Ethernet-like bridges and connecting multiple networks together.
+
+1. `topology subnet` : This line sets the network topology mode for the OpenVPN server. The subnet topology mode treats the VPN network as a subnet and assigns IP addresses to clients from a defined IP address range. This mode is suitable for most VPN deployments where the server acts as the gateway for the connected clients.
+
 1. `ca /etc/ssl/certs/peters_selfsigned_trust_chain.pem`: This line specifies the path to the CA (Certificate Authority) certificate file. The CA certificate is used to verify the authenticity of the server's certificate.
 
 1. `cert /etc/openvpn/server/server.crt`: This line specifies the path to the server's certificate file. The server's certificate is used to authenticate the server to the clients.
 
 1. `key /etc/openvpn/server/server_private.key`: This line specifies the path to the server's private key file. The private key is used for cryptographic operations and should be kept secure.
+
+1. `dh /etc/openvpn/server/dh.pem` : This line specifies the path to the Diffie-Hellman (DH) parameter file. The DH parameters are used during the key exchange process to establish the shared secret key between the server and clients. The dh.pem file contains pre-generated DH parameters, which are necessary for the server's key exchange.
 
 1. `server 192.168.180.0 255.255.255.0`: This line defines the IP address pool for the VPN clients. In this case, it specifies that the server will assign IP addresses from the range 192.168.180.0 to 192.168.180.255 with a netmask of 255.255.255.0.
 
@@ -291,7 +307,7 @@ Description=OpenVPN service
 After=network.target
 
 [Service]
-ExecStart=/usr/sbin/openvpn --config /etc/openvpn/server/server.conf --data-ciphers AES-256-GCM:AES-128-GCM:AES-256-CBC:AES-128-CBC
+ExecStart=/usr/sbin/openvpn --config /etc/openvpn/server/server.conf --data-ciphers AES-256-GCM:AES-128-GCM
 Restart=always
 WorkingDirectory=/etc/openvpn/server
 
@@ -329,7 +345,7 @@ Please note that the choice of cipher methods should align with the security req
 
 
 ## Clear the path
-In this chapter we will configure the local network
+In this chapter we will configure the local network creating static routes open ports etc.
 
 
 ### Routes
@@ -343,7 +359,11 @@ For my explanation the `Router` has the ip address `192.168.178.1`,
 the `Workstation` has the ip address `192.168.178.3` and  
 the `Server` has the ip address `192.168.178.2`.
 
-Additionally the `Server` has a second network interface from the `openvpn.service` which is called `tun1` by default and this interface has the ip address.  
+Additionally the `Server` has a second network interface from the `openvpn.service` which is called `tun1` if the `Server` is configured like in the config section, this interface has the ip address `192.168.180.1`.  
+
+If you want to be able to communicate from your `Workstation` or any other device from the 192.168.178.0/24 network to a client behind the vpn server so with any device from the 192.168.180.0/24 network, you have to create a static rout either on every device that should be able to communicate with the openvpn clients or on the router so the router will redirect the traffic to the vpn-server and that server will than redirect it to the specific client.
+- Keep in mind, that if you create the static route on the router all devices in the network can communicate with the openvpn clients.
+
 
 ### Firewall
 
