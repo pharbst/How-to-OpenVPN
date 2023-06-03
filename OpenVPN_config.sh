@@ -393,12 +393,12 @@ echo -e "\033[0;32mCreating Certificate Signing Requests and $root_CA.crt\033[0m
 echo -e "\033[1;33mPlease fill in the details for $root_CA.key\033[0m"
 openssl req -x509 -new -nodes -key "$root_CA.key" -sha256 -days 365 -out "$root_CA.crt" -subj "/C=$root_CA_country/ST=$root_CA_state/L=$root_CA_locality/O=$root_CA_organization/OU=$root_CA_organizational_unit/CN=$root_CA_common_name/emailAddress=$root_CA_email"
 echo -e "\033[1;33mPlease fill in the details for $intermediate_CA.csr\033[0m"
-openssl req -new -nodes -key "$intermediate_CA.key" -sha256 -days 365 -out "$intermediate_CA.csr" -subj "/C=$intermediate_CA_country/ST=$intermediate_CA_state/L=$intermediate_CA_locality/O=$intermediate_CA_organization/OU=$intermediate_CA_organizational_unit/CN=$intermediate_CA_common_name/emailAddress=$intermediate_CA_email"
+openssl req -new -key "$intermediate_CA.key" -sha256 -days 365 -out "$intermediate_CA.csr" -subj "/C=$intermediate_CA_country/ST=$intermediate_CA_state/L=$intermediate_CA_locality/O=$intermediate_CA_organization/OU=$intermediate_CA_organizational_unit/CN=$intermediate_CA_common_name/emailAddress=$intermediate_CA_email"
 echo -e "\033[1;33mPlease fill in the details for $server.csr\033[0m"
-openssl req -new -nodes -key "$server.key" -sha256 -days 365 -out "$server.csr" -subj "/C=$server_country/ST=$server_state/L=$server_locality/O=$server_organization/OU=$server_organizational_unit/CN=$server_common_name/emailAddress=$server_email"
+openssl req -new -key "$server.key" -sha256 -days 365 -out "$server.csr" -subj "/C=$server_country/ST=$server_state/L=$server_locality/O=$server_organization/OU=$server_organizational_unit/CN=$server_common_name/emailAddress=$server_email"
 for ((i = 1; i <= client_num; i++)); do
 	echo -e "\033[1;33mPlease fill in the details for ${names[i]}.csr\033[0m"
-	openssl req -new -nodes -key "${names[i]}.key" -sha256 -days 365 -out "${names[i]}.csr" -subj "/C=${names_country[i]}/ST=${names_state[i]}/L=${names_locality[i]}/O=${names_organization[i]}/OU=${names_organizational_unit[i]}/CN=${names_common_name[i]}/emailAddress=${names_email[i]}"
+	openssl req -new -key "${names[i]}.key" -sha256 -days 365 -out "${names[i]}.csr" -subj "/C=${names_country[i]}/ST=${names_state[i]}/L=${names_locality[i]}/O=${names_organization[i]}/OU=${names_organizational_unit[i]}/CN=${names_common_name[i]}/emailAddress=${names_email[i]}"
 done
 
 # Signing Certificates
@@ -440,7 +440,6 @@ elif command -v update-ca-certificates >/dev/null 2>&1; then
 	cp trustchain.pem /usr/local/share/ca-certificates/
 	update-ca-certificates
 elif command -v trust >/dev/null 2>&1; then
-	cp trustchain.pem /etc/pki/ca-trust/source/anchors/
 	trust anchor trustchain.pem
 else
 	echo "Unable to add trustchain.pem to the trusted store."
@@ -485,7 +484,7 @@ else
 	conf_route=""
 fi
 
-i = 0
+i=0
 while true; do
 	echo -e "\033[1;33mEnter further push options for the server leave blank if you dont want to add any:\033[0m"
 	read -r conf_push
