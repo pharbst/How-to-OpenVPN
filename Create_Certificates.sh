@@ -1,38 +1,35 @@
 #!/bin/bash
-echo -e "\033[0;32m"
-echo "Creating Private keys"
-echo -e "\033[0m"
-openssl genpkey -algorithm RSA -out root_CA.key -pkeyopt rsa_keygen_bits:4096
-openssl genpkey -algorithm RSA -out intermediate_CA.key -pkeyopt rsa_keygen_bits:4096
-openssl genpkey -algorithm RSA -out server.key -pkeyopt rsa_keygen_bits:4096
-openssl genpkey -algorithm RSA -out client.key -pkeyopt rsa_keygen_bits:4096
 
-echo -e "\033[0;32m"
-echo "Creating Certificate Signing Requests and root_CA.crt"
-echo -e "\033[0m"
-echo -e "\033[1;33m"
-echo "Please fill in the details for root_CA.crt"
-echo -e "\033[0m"
-openssl req -x509 -new -nodes -key root_CA.key -sha256 -days 365 -out root_CA.crt
-echo -e "\033[1;33m"
-echo "Please fill in the details for intermediate_CA.csr"
-echo -e "\033[0m"
-openssl req -new -nodes -key intermediate_CA.key -sha256 -days 365 -out intermediate_CA.csr
-echo -e "\033[1;33m"
-echo "Please fill in the details for server.csr"
-echo -e "\033[0m"
-openssl req -new -nodes -key server.key -sha256 -days 365 -out server.csr
-echo -e "\033[1;33m"
-echo "Please fill in the details for client.csr"
-echo -e "\033[0m"
-openssl req -new -nodes -key client.key -sha256 -days 365 -out client.csr
+File1="root_CA"
+File2="intermediate_CA"
+File3="server"
+File4="client"
 
-echo -e "\033[0;32m"
-echo "Signing Certificates"
-echo -e "\033[0m"
-openssl x509 -req -in intermediate_CA.csr -CA root_CA.crt -CAkey root_CA.key -CAcreateserial -out intermediate_CA.crt -days 365 -sha256
-openssl x509 -req -in server.csr -CA intermediate_CA.crt -CAkey intermediate_private.key -CAcreateserial -out server.crt -days 365 -sha256
-openssl x509 -req -in client.csr -CA intermediate_CA.crt -CAkey intermediate_private.key -CAcreateserial -out client.crt -days 365 -sha256
-echo -e "\033[1;32m"
-echo "Done"
-echo -e "\033[0m"
+echo -e "\033[0;32mCreating Private keys\033[0m"
+openssl genpkey -algorithm RSA -out $File1.key -pkeyopt rsa_keygen_bits:4096
+openssl genpkey -algorithm RSA -out $File2.key -pkeyopt rsa_keygen_bits:4096
+openssl genpkey -algorithm RSA -out $File3.key -pkeyopt rsa_keygen_bits:4096
+openssl genpkey -algorithm RSA -out $File4.key -pkeyopt rsa_keygen_bits:4096
+
+echo -e "\033[0;32mCreating Certificate Signing Requests and $File1.crt\033[0m"
+echo -e "\033[1;33mPlease fill in the details for $File1.key\033[0m"
+openssl req -x509 -new -nodes -key $File1.key -sha256 -days 365 -out $File1.crt
+echo -e "\033[1;33mPlease fill in the details for $File2$csr\033[0m"
+openssl req -new -nodes -key $File2.key -sha256 -days 365 -out $File2.csr
+echo -e "\033[1;33mPlease fill in the details for $File3.csr\033[0m"
+openssl req -new -nodes -key $File3.key -sha256 -days 365 -out $File3.csr
+echo -e "\033[1;33mPlease fill in the details for $File4.csr\033[0m"
+openssl req -new -nodes -key $File4.key -sha256 -days 365 -out $File4.csr
+
+echo -e "\033[0;32mSigning Certificates\033[0m"
+openssl x509 -req -in $File2.csr -CA $File1.crt -CAkey $File1.key -CAcreateserial -out $File2.crt -days 365 -sha256
+openssl x509 -req -in $File3.csr -CA $File2.crt -CAkey $File2.key -CAcreateserial -out $File3.crt -days 365 -sha256
+openssl x509 -req -in $File4.csr -CA $File2.crt -CAkey $File2.key -CAcreateserial -out $File4.crt -days 365 -sha256
+
+echo -e "\033[0;32mCreating Diffie-Hellman parameters\033[0m"
+openssl dhparam -out dhparam.pem 4096
+
+echo -e "\033[0;32mCreating .pem file\033[0m"
+cat $File2.crt $File1.crt > trustchain.pem
+
+echo -e "\033[1;32mDone\033[0m"
